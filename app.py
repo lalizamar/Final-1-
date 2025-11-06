@@ -169,6 +169,26 @@ code { background: rgba(15,23,42,.42); padding: 3px 7px; border-radius: 6px; fon
   <span class="shooting s4"></span>
 </div>
 """, unsafe_allow_html=True)
+
+# —— FONDO CÓSMICO EXTRA (debajo de todo, z-index -4)
+st.markdown("""
+<div id="cosmic-bg"></div>
+<style>
+  #cosmic-bg{
+    position: fixed;
+    inset: 0;
+    z-index: -4; /* más al fondo que #stars (-3) */
+    background:
+      radial-gradient(900px 600px at 12% 18%, #5b21b6 0%, transparent 60%),
+      radial-gradient(800px 520px at 85% 22%, #2563eb 0%, transparent 62%),
+      radial-gradient(700px 500px at 50% 88%, #06b6d4 0%, transparent 64%),
+      radial-gradient(600px 420px at 18% 78%, #f59e0b 0%, transparent 65%),
+      linear-gradient(180deg, #0b1120 0%, #020617 100%);
+    filter: saturate(1.18) brightness(0.96);
+    pointer-events: none;
+  }
+</style>
+""", unsafe_allow_html=True)
 # ================================================================
 
 st.markdown("<div class='container'>", unsafe_allow_html=True)
@@ -299,6 +319,11 @@ if result:
         pass
 
 st.markdown("</div>", unsafe_allow_html=True)  # glass-card
+
+# ---------- PIE ----------
+st.markdown("<p class='footer'>🌠 Camilo Seguro & Laura Orozco • EAFIT • 2025 — Demo estelar por voz • MQTT broker: <code>broker.mqttdashboard.com</code> • Listo para volar 🚀</p>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)  # container
+
 
 # ---------- PIE ----------
 st.markdown("<p class='footer'>🌠 Camilo Seguro • EAFIT • 2025 — Demo estelar por voz • MQTT broker: <code>broker.mqttdashboard.com</code> • Listo para volar 🚀</p>", unsafe_allow_html=True)
