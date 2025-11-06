@@ -355,4 +355,3 @@ st.markdown("</div>", unsafe_allow_html=True)  # glass-card
 st.markdown("<p class='footer'>🌠 Camilo Seguro & Laura Orozco • EAFIT • 2025 — Demo estelar por voz • MQTT broker: <code>broker.mqttdashboard.com</code> • Listo para volar 🚀</p>", unsafe_allow_html=True)
 st.markdown("</div>", unsafe_allow_html=True)  # container
 
-
