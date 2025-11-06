@@ -160,7 +160,14 @@ small, .muted { color: #8ea0c7 !important; }
 }
 .footer { margin-top:1.6rem; color:#93a5c9; font-size:.88rem; text-align:center; }
 code { background: rgba(15,23,42,.42); padding: 3px 7px; border-radius: 6px; font-size: .85rem; color: #a5b4fc; }
+
+/* ---- Animación reducida si el usuario lo pide ---- */
+@media (prefers-reduced-motion: reduce) {
+  #stars, #stars2, #stars3, .shooting, .o1, .o2, .o3 { animation: none !important; }
+}
 </style>
+
+<!-- Capas de estrellas / fugaces (tu set actual) -->
 <div id="stars"></div><div id="stars2"></div><div id="stars3"></div>
 <div class="shooting-wrap">
   <span class="shooting"></span>
@@ -170,22 +177,46 @@ code { background: rgba(15,23,42,.42); padding: 3px 7px; border-radius: 6px; fon
 </div>
 """, unsafe_allow_html=True)
 
-# —— FONDO CÓSMICO EXTRA (debajo de todo, z-index -4)
+# —— FONDO CÓSMICO EXTRA + AURORA (debajo de todo, no toca lógica)
 st.markdown("""
 <div id="cosmic-bg"></div>
+<div id="aurora"></div>
 <style>
+  /* Nebulosa multicolor fija (base) */
   #cosmic-bg{
     position: fixed;
     inset: 0;
-    z-index: -4; /* más al fondo que #stars (-3) */
+    z-index: -5; /* más al fondo que #stars (-3) */
     background:
-      radial-gradient(900px 600px at 12% 18%, #5b21b6 0%, transparent 60%),
-      radial-gradient(800px 520px at 85% 22%, #2563eb 0%, transparent 62%),
-      radial-gradient(700px 500px at 50% 88%, #06b6d4 0%, transparent 64%),
-      radial-gradient(600px 420px at 18% 78%, #f59e0b 0%, transparent 65%),
+      radial-gradient(1200px 900px at 8% 12%,   #6d28d9 0%, transparent 60%),
+      radial-gradient(1000px 700px at 88% 20%,  #2563eb 0%, transparent 62%),
+      radial-gradient(900px 600px at 50% 85%,   #06b6d4 0%, transparent 64%),
+      radial-gradient(720px 520px at 22% 78%,   #f59e0b 0%, transparent 66%),
+      radial-gradient(640px 480px at 78% 72%,   #ef4444 0%, transparent 68%),
       linear-gradient(180deg, #0b1120 0%, #020617 100%);
-    filter: saturate(1.18) brightness(0.96);
+    filter: saturate(1.22) brightness(0.98) contrast(1.02);
     pointer-events: none;
+  }
+
+  /* Capa aurora animada — movimiento muy lento para “vivo” */
+  #aurora{
+    position: fixed;
+    inset: -10%;
+    z-index: -4;
+    background:
+      conic-gradient(from 120deg at 30% 40%, rgba(168,85,247,.28), rgba(59,130,246,.22), rgba(34,197,94,.18), rgba(168,85,247,.28)),
+      radial-gradient(60% 40% at 70% 20%, rgba(99,102,241,.28), transparent 60%),
+      radial-gradient(50% 35% at 20% 80%, rgba(16,185,129,.22), transparent 65%);
+    mix-blend-mode: screen;
+    animation: drift 60s linear infinite;
+    opacity: .65;
+    pointer-events: none;
+    filter: blur(14px) saturate(1.1);
+  }
+  @keyframes drift {
+    0%   { transform: translate3d(0,0,0) rotate(0deg); }
+    50%  { transform: translate3d(-2%, -1%, 0) rotate(2deg); }
+    100% { transform: translate3d(0,0,0) rotate(0deg); }
   }
 </style>
 """, unsafe_allow_html=True)
