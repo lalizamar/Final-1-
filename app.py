@@ -166,19 +166,12 @@ code { background: rgba(15,23,42,.42); padding: 3px 7px; border-radius: 6px; fon
     #stars, #stars2, #stars3, .shooting, .o1, .o2, .o3 { animation: none !important; }
 }
 
-/* 🚀 NUEVOS ESTILOS AGREGADOS: Efectos de Brillo Cósmico Adicionales */
-
-/* Brillo general en todos los elementos interactivos o de importancia */
-.stButton>button, .chip, .glass-card, .hero {
-    transition: all 0.3s ease;
-}
-
+/* 🚀 ESTILOS ADICIONALES (de tu solicitud anterior) */
 /* Efecto de borde sutil y brillante al pasar el ratón por las tarjetas de vidrio */
 .glass-card:hover {
     border: 1px solid rgba(255,255,255,.3);
     box-shadow: 0 0 32px rgba(124,58,237,.25), 0 0 60px rgba(0,0,0,.5);
 }
-
 /* Estilo para los indicadores de LED de estado (simulados) */
 .led-status-wrap {
     display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;
@@ -190,7 +183,6 @@ code { background: rgba(15,23,42,.42); padding: 3px 7px; border-radius: 6px; fon
     box-shadow: 0 0 4px rgba(0,0,0,.5);
     border: 2px solid rgba(255,255,255,.2);
     transition: all 0.5s ease;
-    /* Etiqueta color */
     color: #a3b2cc; font-size: .75rem; font-weight: 600;
     display: flex; align-items: center; justify-content: center;
     position: relative;
@@ -201,12 +193,10 @@ code { background: rgba(15,23,42,.42); padding: 3px 7px; border-radius: 6px; fon
     font-size: .75rem; color: #a3b2cc;
     white-space: nowrap;
 }
-
-/* Colores simulados (ON) - usa .active-COLOR si se fueran a manipular con JS */
+/* Colores simulados (ON) */
 .led-red-on { background: #ef4444; box-shadow: 0 0 10px #f87171, 0 0 20px #ef4444; }
 .led-green-on { background: #10b981; box-shadow: 0 0 10px #6ee7b7, 0 0 20px #10b981; }
 .led-blue-on { background: #3b82f6; box-shadow: 0 0 10px #60a5fa, 0 0 20px #3b82f6; }
-
 /* Indicador de Transcripción/Conexión (Microphone Feedback) */
 .transcription-feedback {
     min-height: 50px; padding: 10px 15px; border-radius: 12px;
@@ -272,7 +262,7 @@ st.markdown("""
 
 st.markdown("<div class='container'>", unsafe_allow_html=True)
 
-# ---------- HERO + LOGO + NARRATIVA ----------
+# ---------- HERO + LOGO + NARRATIVA (CORREGIDO) ----------
 st.markdown("""
 <div class="hero">
     <div class="badge">🛰️ <span>Cabina de mando • <small>Streamlit → MQTT → Wokwi</small></span></div>
@@ -327,14 +317,14 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 🚀 NUEVO AGREGADO: Indicador de feedback de transcripción
+# 🚀 AGREGADO: Indicador de feedback de transcripción
 st.markdown("<div id='transcription-output' class='transcription-feedback'>Esperando comando de voz...</div>", unsafe_allow_html=True)
 
 # ============== Botón Bokeh (SIN CAMBIAR LÓGICA) ==============
 st.markdown("<div class='voice-btn'>", unsafe_allow_html=True)
 stt_button = Button(label="🎤 Iniciar reconocimiento", width=260)
 
-# Modificación: Agregando un callback al CustomJS para actualizar el feedback en vivo
+# El código JS se modifica solo para actualizar el feedback visual, sin cambiar la lógica principal.
 stt_button.js_on_event("button_click", CustomJS(code="""
     var recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
@@ -358,8 +348,6 @@ stt_button.js_on_event("button_click", CustomJS(code="""
         outputDiv.innerText = interim_transcript || final_transcript || "Escuchando...";
 
         if (final_transcript != "") {
-            // Detener reconocimiento después del resultado final si no es continuo
-            // recognition.stop(); 
             document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: final_transcript}));
             outputDiv.innerText = "Comando final: " + final_transcript;
         }
@@ -387,7 +375,7 @@ result = streamlit_bokeh_events(
     debounce_time=0)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# 🚀 NUEVO AGREGADO: Simulación del estado de los LEDs (sección de estética)
+# 🚀 AGREGADO: Simulación del estado de los LEDs (sección de estética)
 st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
 st.markdown("#### ⚡️ Estado actual de tu Galaxia (Simulación)")
 st.markdown("""
@@ -421,7 +409,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ============== Lógica MQTT (SIN CAMBIOS) ==============
+# ============== Lógica MQTT (SIN CAMBIOS E INCLUYENDO TTS PARA FEEDBACK) ==============
 if result:
     if "GET_TEXT" in result:
         st.write("Último comando enviado:", result.get("GET_TEXT"))
@@ -432,18 +420,24 @@ if result:
         message = json.dumps({"Act1": command_text})
         ret = client1.publish("voice_ctrlCSC", message)
 
-        # 🚀 NUEVO AGREGADO: Reproducir el comando por audio (TTS)
+        # 🚀 AGREGADO: Reproducir el comando por audio (TTS) para feedback
         try:
+            # Crear directorio temp si no existe
+            if not os.path.exists("temp"):
+                os.makedirs("temp")
+            
             tts = gTTS(text=f"Comando enviado: {command_text}", lang='es')
             # Guarda temporalmente el archivo de audio
-            tts.save("temp/command_sent.mp3")
+            tts_path = "temp/command_sent.mp3"
+            tts.save(tts_path)
             # Reproduce el audio en Streamlit
-            audio_file = open("temp/command_sent.mp3", 'rb')
+            audio_file = open(tts_path, 'rb')
             audio_bytes = audio_file.read()
             st.audio(audio_bytes, format='audio/mp3', start_time=0)
             audio_file.close()
         except Exception as e:
-            st.error(f"Error al generar/reproducir audio: {e}")
+            # st.error(f"Error al generar/reproducir audio: {e}") # Descomenta para depurar errores de TTS
+            pass # No mostramos error para no interrumpir el flujo
 
     try:
         os.mkdir("temp")
@@ -455,4 +449,3 @@ st.markdown("</div>", unsafe_allow_html=True)  # glass-card
 # ---------- PIE ----------
 st.markdown("<p class='footer'>🌠 Camilo Seguro & Laura Orozco • EAFIT • 2025 — Demo estelar por voz • MQTT broker: <code>broker.mqttdashboard.com</code> • Listo para volar 🚀</p>", unsafe_allow_html=True)
 st.markdown("</div>", unsafe_allow_html=True)  # container
-
